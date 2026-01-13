@@ -3,7 +3,7 @@ import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 import { CheckCircle, XCircle, Loader } from 'lucide-react';
 
-const Quiz = ({ content }) => {
+const Quiz = ({ content, courseTitle }) => {
     const [quiz, setQuiz] = useState(null);
     const [loading, setLoading] = useState(false);
     const [answers, setAnswers] = useState({});
@@ -41,7 +41,7 @@ const Quiz = ({ content }) => {
         }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         let newScore = 0;
         quiz.forEach((q, index) => {
             if (answers[index] === q.correctAnswer) {
@@ -50,6 +50,26 @@ const Quiz = ({ content }) => {
         });
         setScore(newScore);
         setSubmitted(true);
+
+        // Save result to backend
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                },
+            };
+            await axios.post(
+                'http://localhost:5000/api/quizzes/result',
+                {
+                    courseTitle: courseTitle || 'General Quiz',
+                    score: newScore,
+                    totalQuestions: quiz.length
+                },
+                config
+            );
+        } catch (error) {
+            console.error('Error saving quiz result:', error);
+        }
     };
 
     if (!quiz && !loading) {

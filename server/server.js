@@ -18,6 +18,7 @@ connectDB();
 app.use('/api/users', require('./routes/authRoutes'));
 app.use('/api/courses', require('./routes/courseRoutes'));
 app.use('/api/ai', require('./routes/aiRoutes'));
+app.use('/api/quizzes', require('./routes/quizRoutes'));
 
 app.get('/', (req, res) => {
     res.send('API is running...');

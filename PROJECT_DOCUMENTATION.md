@@ -34,12 +34,18 @@ Secure registration and login functionality allow users to create personalized a
 Upon logging in, users are greeted with a comprehensive dashboard displaying available courses, current progress, and quick access to daily learning tasks.
 
 ### 3.3 AI-Powered Quizzes
-Unlike static question banks, the platform generates quizzes dynamically. The system analyzes course content and prompts the AI model to create unique questions, ensuring that assessments remain challenging and relevant.
+Unlike static question banks, the platform generates quizzes dynamically. The system analyzes course content and prompts the AI model to create unique questions, ensuring that assessments remain challenging and relevant. Results are stored in the database to track student progress over time.
 
 ### 3.4 AI Tutor
 A dedicated chat interface allows users to ask questions related to their studies. The AI Tutor provides instant, accurate explanations, acting as a 24/7 study companion.
 
-### 3.5 Resource Management & Daily Tasks
+### 3.5 Real-time Analytics Dashboard
+The platform features a sophisticated analytics dashboard using **Recharts**. It visualizes student performance trends, average scores, and learning consistency. This data-driven approach helps students identify their strengths and weaknesses.
+
+### 3.6 AI-Driven Recommendations
+Based on quiz performance, the system provides intelligent recommendations. If a student struggles with a specific topic, the AI suggests targeted practice quizzes to bridge the knowledge gap.
+
+### 3.7 Resource Management & Daily Tasks
 Users can access a library of learning resources and track their daily learning goals (`DailyTasks`), promoting consistent study habits.
 
 ## 4. Methodology
