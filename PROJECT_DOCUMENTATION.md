@@ -45,7 +45,13 @@ The platform features a sophisticated analytics dashboard using **Recharts**. It
 ### 3.6 AI-Driven Recommendations
 Based on quiz performance, the system provides intelligent recommendations. If a student struggles with a specific topic, the AI suggests targeted practice quizzes to bridge the knowledge gap.
 
-### 3.7 Resource Management & Daily Tasks
+### 3.7 AI Job Application Automation System (Job Hub)
+The platform includes a cutting-edge career module that automates the job application process:
+- **AI Resume Analyzer**: Automatically compares a user's resume against a job description, providing an ATS match score and identifying missing keywords.
+- **Cover Letter Automator**: Generates highly personalized, professional cover letters tailored to specific job roles instantly.
+- **Career Strategy AI**: Provides actionable feedback on how to improve a resume to match industry standards.
+
+### 3.8 Resource Management & Daily Tasks
 Users can access a library of learning resources and track their daily learning goals (`DailyTasks`), promoting consistent study habits.
 
 ## 4. Methodology

@@ -48,6 +48,7 @@ const Dashboard = () => {
                             <span className="text-indigo-600 font-medium border-b-2 border-indigo-600 cursor-default">Relax Games</span>
                             <a href="/resources" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Resources</a>
                             <a href="/daily-tasks" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Daily Tasks</a>
+                            <a href="/job-hub" className="text-gray-600 hover:text-indigo-600 font-medium transition-colors">Job Hub</a>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -204,6 +205,5 @@ const Dashboard = () => {
         </div>
     );
 };
-
 
 export default Dashboard;

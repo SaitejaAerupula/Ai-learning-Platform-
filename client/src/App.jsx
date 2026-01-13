@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Resources from './pages/Resources';
 import DailyTasks from './pages/DailyTasks';
+import JobHub from './pages/JobHub';
 import Landing from './pages/Landing';
 import PrivateRoute from './components/PrivateRoute';
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/resources" element={<PrivateRoute><Resources /></PrivateRoute>} />
           <Route path="/daily-tasks" element={<PrivateRoute><DailyTasks /></PrivateRoute>} />
+          <Route path="/job-hub" element={<PrivateRoute><JobHub /></PrivateRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

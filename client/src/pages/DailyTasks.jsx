@@ -57,6 +57,7 @@ const DailyTasks = () => {
                         <Link to="/dashboard" className="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</Link>
                         <Link to="/resources" className="text-gray-600 hover:text-indigo-600 font-medium">Resources</Link>
                         <span className="text-indigo-600 font-medium border-b-2 border-indigo-600">Daily Tasks</span>
+                        <Link to="/job-hub" className="text-gray-600 hover:text-indigo-600 font-medium">Job Hub</Link>
                         <div className="h-6 w-px bg-gray-300"></div>
                         <div className="flex items-center gap-1 bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">
                             <span className="text-lg">🔥</span>
@@ -77,10 +78,6 @@ const DailyTasks = () => {
                     <h2 className="text-3xl font-bold text-gray-900 mb-4">Your Daily Tasks</h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
                         Stay on top of your career and skill development. Visit these platforms daily to ensure consistent growth.
-                        <br />
-                        <span className="text-sm text-indigo-600 italic">
-                            (Note: Opening these links will keep you logged in if you chose "Remember Me" on their websites)
-                        </span>
                     </p>
                 </div>
 

@@ -57,6 +57,7 @@ const Resources = () => {
                         <Link to="/dashboard" className="text-gray-600 hover:text-indigo-600 font-medium">Dashboard</Link>
                         <span className="text-indigo-600 font-medium border-b-2 border-indigo-600">Resources</span>
                         <Link to="/daily-tasks" className="text-gray-600 hover:text-indigo-600 font-medium">Daily Tasks</Link>
+                        <Link to="/job-hub" className="text-gray-600 hover:text-indigo-600 font-medium">Job Hub</Link>
                         <div className="h-6 w-px bg-gray-300"></div>
                         <div className="flex items-center gap-1 bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">
                             <span className="text-lg">🔥</span>
