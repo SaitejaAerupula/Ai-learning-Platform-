@@ -7,65 +7,59 @@ import { Link } from 'react-router-dom';
 const JobHub = () => {
     const { user, logout } = useContext(AuthContext);
     const [resume, setResume] = useState('');
+    const [resumeFile, setResumeFile] = useState(null);
     const [jobDesc, setJobDesc] = useState('');
     const [loading, setLoading] = useState(false);
     const [analysis, setAnalysis] = useState(null);
     const [activeTab, setActiveTab] = useState('analyzer'); // analyzer or coverletter
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setResumeFile(file);
+            setResume(''); // Clear text if file is selected
+        }
+    };
+
     const analyzeJob = async () => {
-        if (!resume || !jobDesc) {
-            alert('Please provide both your resume text and the job description.');
+        if (!resume && !resumeFile) {
+            alert('Please provide your resume (text or file).');
+            return;
+        }
+        if (!jobDesc) {
+            alert('Please provide the job description.');
             return;
         }
 
         setLoading(true);
         try {
             const config = {
-                headers: { Authorization: `Bearer ${user.token}` },
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                    'Content-Type': 'multipart/form-data'
+                },
             };
 
-            // Reusing the AI chat endpoint with a specific prompt for "Automation"
-            const prompt = `
-                Analyze this Resume against the Job Description.
-                
-                RESUME:
-                ${resume}
-                
-                JOB DESCRIPTION:
-                ${jobDesc}
-                
-                Return a JSON object with:
-                1. matchScore (0-100)
-                2. missingKeywords (array)
-                3. strengths (array)
-                4. improvements (array)
-                5. tailoredCoverLetter (string)
-            `;
+            const formData = new FormData();
+            if (resumeFile) {
+                formData.append('resume', resumeFile);
+            } else {
+                formData.append('resumeText', resume);
+            }
+            formData.append('jobDescription', jobDesc);
 
             const { data } = await axios.post(
-                'http://localhost:5000/api/ai/chat',
-                { message: prompt, context: "You are an expert HR and Career Coach." },
+                'http://localhost:5000/api/ai/analyze-resume',
+                formData,
                 config
             );
 
-            // Parse the AI response (assuming it returns JSON in the reply)
-            // We'll add a safety check in case the AI returns text instead of raw JSON
-            try {
-                const cleanedJson = data.reply.replace(/```json/g, '').replace(/```/g, '').trim();
-                setAnalysis(JSON.parse(cleanedJson));
-            } catch (e) {
-                // Fallback if AI doesn't return perfect JSON
-                setAnalysis({
-                    matchScore: 75,
-                    missingKeywords: ["React Hooks", "System Design"],
-                    strengths: ["Strong Frontend Background", "Experience with Node.js"],
-                    improvements: ["Quantify your achievements", "Add more keywords from the JD"],
-                    tailoredCoverLetter: data.reply
-                });
-            }
+            setAnalysis(data);
+            setActiveTab('analyzer'); // Show analysis first
         } catch (error) {
             console.error('Analysis Error:', error);
-            alert('Failed to automate analysis. Check your API key.');
+            const errorMsg = error.response?.data?.message || 'Failed to automate analysis. Please ensure your GEMINI_API_KEY is active on the server.';
+            alert(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -93,7 +87,7 @@ const JobHub = () => {
                 <div className="text-center mb-12">
                     <h2 className="text-4xl font-extrabold text-gray-900 mb-4">AI Job Application Automator</h2>
                     <p className="text-gray-600 max-w-2xl mx-auto">
-                        Stop spending hours tailoring applications. Let our AI automate your resume analysis and cover letter generation.
+                        Stop spending hours tailoring applications. Upload your resume and let our AI automate your analysis and cover letter generation.
                     </p>
                 </div>
 
@@ -101,15 +95,46 @@ const JobHub = () => {
                     {/* Input Section */}
                     <div className="space-y-6">
                         <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-                            <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-indigo-600" /> Paste Your Resume
-                            </label>
-                            <textarea
-                                className="w-full h-48 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-sm"
-                                placeholder="Paste your current resume text here..."
-                                value={resume}
-                                onChange={(e) => setResume(e.target.value)}
-                            ></textarea>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                    <FileText className="w-4 h-4 text-indigo-600" /> Your Resume
+                                </label>
+                                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">PDF, DOCX or Text</span>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-center w-full">
+                                    <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer transition-all ${resumeFile ? 'bg-indigo-50 border-indigo-300' : 'bg-gray-50 border-gray-300 hover:bg-gray-100'}`}>
+                                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <Sparkles className={`w-8 h-8 mb-3 ${resumeFile ? 'text-indigo-600' : 'text-gray-400'}`} />
+                                            <p className="mb-2 text-sm text-gray-500">
+                                                <span className="font-semibold">{resumeFile ? resumeFile.name : 'Click to upload resume'}</span>
+                                            </p>
+                                            <p className="text-xs text-gray-400">PDF or DOCX (Max 5MB)</p>
+                                        </div>
+                                        <input type="file" className="hidden" accept=".pdf,.docx" onChange={handleFileChange} />
+                                    </label>
+                                </div>
+
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t border-gray-200"></span>
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-white px-2 text-gray-400 font-bold">Or Paste Text</span>
+                                    </div>
+                                </div>
+
+                                <textarea
+                                    className="w-full h-32 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-sm"
+                                    placeholder="Paste your resume text here if you don't have a file..."
+                                    value={resume}
+                                    onChange={(e) => {
+                                        setResume(e.target.value);
+                                        setResumeFile(null); // Clear file if text is pasted
+                                    }}
+                                ></textarea>
+                            </div>
                         </div>
 
                         <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
@@ -135,14 +160,14 @@ const JobHub = () => {
                     </div>
 
                     {/* Output Section */}
-                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col">
+                    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col min-h-[500px]">
                         {!analysis && !loading ? (
                             <div className="flex-grow flex flex-col items-center justify-center p-12 text-center text-gray-400">
                                 <div className="bg-gray-50 p-6 rounded-full mb-4">
                                     <Send className="w-12 h-12" />
                                 </div>
                                 <p className="text-lg font-medium">Ready to Automate?</p>
-                                <p className="text-sm">Upload your details to see the magic happen.</p>
+                                <p className="text-sm">Upload your resume and JD to see the magic happen.</p>
                             </div>
                         ) : loading ? (
                             <div className="flex-grow flex flex-col items-center justify-center p-12 text-center">

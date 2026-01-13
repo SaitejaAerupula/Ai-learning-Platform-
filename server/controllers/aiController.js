@@ -3,6 +3,9 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+const pdf = require('pdf-parse');
+const mammoth = require('mammoth');
+
 // @desc    Generate a quiz based on text content
 // @route   POST /api/ai/generate-quiz
 // @access  Private
@@ -100,8 +103,78 @@ const chatWithTutor = async (req, res) => {
         res.json({ reply: text });
     } catch (error) {
         console.error('AI Chat Error:', error);
-        res.json({ reply: "I'm having trouble connecting to my brain right now. (Check API Key)" });
+        res.json({ reply: "I'm having trouble connecting to my brain right now. Please ensure your GEMINI_API_KEY is set correctly in the server .env file." });
     }
 };
 
-module.exports = { generateQuiz, chatWithTutor };
+// @desc    Analyze Resume (Text or File)
+// @route   POST /api/ai/analyze-resume
+// @access  Private
+const analyzeResume = async (req, res) => {
+    try {
+        let resumeText = req.body.resumeText;
+        const { jobDescription } = req.body;
+
+        // If a file is uploaded, extract text from it
+        if (req.file) {
+            const buffer = req.file.buffer;
+            const mimetype = req.file.mimetype;
+
+            if (mimetype === 'application/pdf') {
+                const data = await pdf(buffer);
+                resumeText = data.text;
+            } else if (mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                const data = await mammoth.extractRawText({ buffer });
+                resumeText = data.value;
+            } else {
+                return res.status(400).json({ message: 'Unsupported file type. Please upload PDF or DOCX.' });
+            }
+        }
+
+        if (!resumeText || !jobDescription) {
+            return res.status(400).json({ message: 'Both resume and job description are required.' });
+        }
+
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const prompt = `
+            Analyze this Resume against the Job Description.
+            
+            RESUME:
+            ${resumeText}
+            
+            JOB DESCRIPTION:
+            ${jobDescription}
+            
+            Return a JSON object with:
+            1. matchScore (number 0-100)
+            2. missingKeywords (array of strings)
+            3. strengths (array of strings)
+            4. improvements (array of strings)
+            5. tailoredCoverLetter (string, professional and persuasive)
+
+            IMPORTANT: Return ONLY the raw JSON object. Do not include any markdown formatting or extra text.
+        `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        // Clean up the text if it contains markdown code blocks
+        const cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        try {
+            const analysis = JSON.parse(cleanedText);
+            res.json(analysis);
+        } catch (parseError) {
+            console.error('JSON Parse Error:', parseError, 'Raw Text:', text);
+            res.status(500).json({ message: 'Failed to parse AI response. Please try again.' });
+        }
+
+    } catch (error) {
+        console.error('Resume Analysis Error:', error);
+        res.status(500).json({ message: 'Error analyzing resume. Check API Key or file format.' });
+    }
+};
+
+module.exports = { generateQuiz, chatWithTutor, analyzeResume };
