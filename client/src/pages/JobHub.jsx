@@ -58,7 +58,14 @@ const JobHub = () => {
             setActiveTab('analyzer'); // Show analysis first
         } catch (error) {
             console.error('Analysis Error:', error);
-            const errorMsg = error.response?.data?.message || 'Failed to automate analysis. Please ensure your GEMINI_API_KEY is active on the server.';
+            let errorMsg = 'Failed to automate analysis.';
+
+            if (!error.response) {
+                errorMsg = 'Server is not responding. Please restart your backend server (npm start).';
+            } else {
+                errorMsg = error.response.data?.message || 'AI Error. Please check if your GEMINI_API_KEY is valid and has quota.';
+            }
+
             alert(errorMsg);
         } finally {
             setLoading(false);
